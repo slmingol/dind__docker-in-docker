@@ -12,7 +12,9 @@ CONTAINER ID   IMAGE          COMMAND                  CREATED              STAT
 700f961e78b6   68417a7d2516   "dockerd-entrypoint.…"   About a minute ago   Up About a minute   2375-2376/tcp   dind
 
 
-$ docker exec -it dind docker run --privileged -it --rm leodotcloud/swiss-army-knife:latest ip addr list
+$ docker exec -it dind \
+    docker run --privileged -it --rm leodotcloud/swiss-army-knife:latest ip addr list
+
 1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
     link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
     inet 127.0.0.1/8 scope host lo
@@ -25,14 +27,14 @@ $ docker exec -it dind docker run --privileged -it --rm leodotcloud/swiss-army-k
     link/ether 02:42:ac:12:00:02 brd ff:ff:ff:ff:ff:ff link-netnsid 0
     inet 172.18.0.2/16 brd 172.18.255.255 scope global eth0
        valid_lft forever preferred_lft forever
-
 ```
 
 
-## Interactively work with things
-
+## Running things interactively
 ```
-$ docker run -it --privileged --rm --name dind $(docker image  ls | grep '<none>' | head -1 | awk '{print $3}') sh
+$ docker run -it --privileged --rm --name dind \
+    $(docker image  ls | grep '<none>' | head -1 | awk '{print $3}') sh
+
 + '[' 1 -eq 0 ]
 + '[' sh '!=' sh ]
 + '[' sh '=' dockerd ]
@@ -80,3 +82,20 @@ INFO[2021-03-27T02:18:52.070016300Z] ccResolverWrapper: sending update to cc: {[
 ```
 
 **NOTE:** Above you can see the `--mtu=1410` passed into the invocation of `dockerd`.
+
+### And to confirm within a nested docker container that its MTU is 1410
+```
+$ docker exec -it dind docker run --privileged -it --rm leodotcloud/swiss-army-knife:latest ip addr list
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+       valid_lft forever preferred_lft forever
+2: tunl0@NONE: <NOARP> mtu 1480 qdisc noop state DOWN group default qlen 1000
+    link/ipip 0.0.0.0 brd 0.0.0.0
+3: ip6tnl0@NONE: <NOARP> mtu 1452 qdisc noop state DOWN group default qlen 1000
+    link/tunnel6 :: brd ::
+7: eth0@if8: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1410 qdisc noqueue state UP group default
+    link/ether 02:42:ac:12:00:02 brd ff:ff:ff:ff:ff:ff link-netnsid 0
+    inet 172.18.0.2/16 brd 172.18.255.255 scope global eth0
+       valid_lft forever preferred_lft forever
+```
