@@ -14,7 +14,8 @@ CONTAINER ID   IMAGE          COMMAND                  CREATED              STAT
 
 $ docker exec -it dind \
     docker run --privileged -it --rm leodotcloud/swiss-army-knife:latest ip addr list
-
+...
+...
 1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
     link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
     inet 127.0.0.1/8 scope host lo
@@ -34,7 +35,8 @@ $ docker exec -it dind \
 ```
 $ docker run -it --privileged --rm --name dind \
     $(docker image  ls | grep '<none>' | head -1 | awk '{print $3}') sh
-
+...
+...
 + '[' 1 -eq 0 ]
 + '[' sh '!=' sh ]
 + '[' sh '=' dockerd ]
@@ -85,7 +87,10 @@ INFO[2021-03-27T02:18:52.070016300Z] ccResolverWrapper: sending update to cc: {[
 
 ### And to confirm within a nested docker container that its MTU is 1410
 ```
-$ docker exec -it dind docker run --privileged -it --rm leodotcloud/swiss-army-knife:latest ip addr list
+$ docker exec -it dind \
+    docker run --privileged -it --rm leodotcloud/swiss-army-knife:latest ip addr list
+...
+...
 1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
     link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
     inet 127.0.0.1/8 scope host lo
